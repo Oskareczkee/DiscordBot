@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace DiscordBot.Attributes.Enums
 {
-    public enum ChannelCheckMode
-    {
-        Any, None, MineOrParentAny
-    }
+    public enum ChannelCheckMode{Any, None, MineOrParentAny}
+
+    public enum TimeCheckMode{None, Fight, Quest}
 
 
 }

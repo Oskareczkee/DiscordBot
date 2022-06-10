@@ -1,10 +1,13 @@
 ﻿using DAL.Models.Profiles;
+using System;
 using static System.Math;
 
 namespace Bot.Commands.Helpers
 {
     public class BotMath
     {
+        public static Random RandomNumberGenerator = new Random((int)DateTime.Now.Ticks);
+
         /// <summary>
         /// Calculates the cost of levelling up a skill depending on its actual level
         /// </summary>

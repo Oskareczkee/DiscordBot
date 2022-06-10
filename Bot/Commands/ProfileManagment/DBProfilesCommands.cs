@@ -28,97 +28,13 @@ namespace Bot.Commands.ProfileManagment
         }
 
         [Command("profile"), AddXP(10)]
+        [Description("Shows user profile")]
         public async Task GetProfile(CommandContext ctx, DiscordMember member=null)
         {
             if (member == null)
                 await DisplayProfileAsync(ctx, ctx.Member.Id).ConfigureAwait(false);
             else
                 await DisplayProfileAsync(ctx, member.Id).ConfigureAwait(false);
-        }
-
-        [Command("equipment"), AddXP(10)]
-        public async Task GetEquipment(CommandContext ctx, DiscordMember member = null)
-        {
-            if (member == null)
-                await DisplayEquipmentAsync(ctx, ctx.Member.Id).ConfigureAwait(false);
-            else
-                await DisplayEquipmentAsync(ctx, member.Id).ConfigureAwait(false);
-        }
-
-        private async Task DisplayEquipmentAsync(CommandContext ctx, ulong memberID)
-        {
-            Profile profile = await _profileService.GetOrCreateProfileAsync(memberID, ctx.Guild.Id).ConfigureAwait(false);
-
-            DiscordMember member = ctx.Guild.Members[profile.DiscordID];
-
-
-            var profileEmbed = new DiscordEmbedBuilder
-            {
-                Title = $"{ctx.Guild.Members[profile.DiscordID].DisplayName}'s equipment",
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = member.AvatarUrl },
-                Color = DiscordColor.Blue
-            };
-            //profile.Equipment.Add(null);
-            //profile.Equipment = Enumerable.Repeat(new EquipmentItem { ProfileID = profile.ID, Item = null }, 9).ToList();
-
-            foreach (var item in profile.Equipment)
-            {
-                if (item.Item != null)
-                    profileEmbed.AddField(item.Item.Type.ToString(), item.Item.Name, true);
-                else
-                    profileEmbed.AddField("aa", "aa", true);
-            }
-     
-
-            /*
-            if(profile.Equipment[0]!=null)
-                profileEmbed.AddField("Helmet:", profile.Equipment[0].Item.Name, true);
-            else
-                profileEmbed.AddField("Helmet:", "None", true);
-
-            if (profile.Equipment[1] != null)
-                profileEmbed.AddField("Chestplate:", profile.Equipment[1].Item.Name, true);
-            else
-                profileEmbed.AddField("Chestplate:", "None", true);
-
-            if (profile.Equipment[2] != null)
-                profileEmbed.AddField("Gloves:", profile.Equipment[2].Item.Name, true);
-            else
-                profileEmbed.AddField("Gloves:", "None", true);
-
-            if (profile.Equipment[3] != null)
-                profileEmbed.AddField("Shoes:", profile.Equipment[3].Item.Name, true);
-            else
-                profileEmbed.AddField("Shoes:", "None", true);
-
-            if (profile.Equipment[4] != null)
-                profileEmbed.AddField("Weapon:", profile.Equipment[4].Item.Name, true);
-            else
-                profileEmbed.AddField("Weapon:", "None", true);
-
-            if (profile.Equipment[5] != null)
-                profileEmbed.AddField("Ring:", profile.Equipment[5].Item.Name, true);
-            else
-                profileEmbed.AddField("Ring:", "None", true);
-
-            if (profile.Equipment[6] != null)
-                profileEmbed.AddField("Belt:", profile.Equipment[6].Item.Name, true);
-            else
-                profileEmbed.AddField("Belt:", "None", true);
-
-            if (profile.Equipment[7] != null)
-                profileEmbed.AddField("Necklace:", profile.Equipment[7].Item.Name, true);
-            else
-                profileEmbed.AddField("Necklace:", "None", true);
-
-            if (profile.Equipment[8] != null)
-                profileEmbed.AddField("Extra:", profile.Equipment[8].Item.Name, true);
-            else
-                profileEmbed.AddField("Extra:", "None", true);
-             */
-
-
-            await ctx.Channel.SendMessageAsync(embed: profileEmbed).ConfigureAwait(false);
         }
 
         private async Task DisplayProfileAsync(CommandContext ctx, ulong memberID)
@@ -155,6 +71,16 @@ namespace Bot.Commands.ProfileManagment
 
 
             await ctx.Channel.SendMessageAsync(embed: profileEmbed).ConfigureAwait(false);
+        }
+
+        //i didn't know where to put this command, so i left it here
+        [Command("beggold"), AddXP(5)]
+        [Description("Beggar simulator")]
+        public async Task BegGold(CommandContext ctx)
+        {
+            int GoldAmount = BotMath.RandomNumberGenerator.Next(1, 10);
+            await ctx.Channel.SendMessageAsync($"You little beggar! Fortunately people are kind and gave you {GoldAmount} gold");
+            await _profileService.AddGold(ctx.Member.Id, ctx.Guild.Id, GoldAmount);
         }
     }
 }

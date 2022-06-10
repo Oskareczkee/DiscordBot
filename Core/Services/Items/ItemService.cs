@@ -1,4 +1,5 @@
-﻿using Core.Services.Profiles;
+﻿using Core.Math;
+using Core.Services.Profiles;
 using DAL;
 using DAL.Models.Items;
 using DAL.Models.Profiles;
@@ -21,9 +22,8 @@ namespace Core.Services.Items
         Task<ItemPurchaseState> PurchaseItemAsync(ulong discordId, ulong guildID, string itemName);
 
         Task AddItemAsync(ulong discordID, ulong guildID, Item item);
-        Task AddProfileItemAsync(ulong discordID, ulong guildID, ProfileItem item);
         Task<List<Item>> GetItemsListAsync();
-        Task<bool> EquipItemAsync(ulong discordID, ulong guildID, ProfileItem item);
+        Task<Item> GetRandomItem();
     }
 
 
@@ -42,8 +42,6 @@ namespace Core.Services.Items
         public async Task<Item> GetItemByName(string name)
         {
             using var _context = new Context(_options);
-
-            name = name.ToLower();
             return await _context.Items.FirstOrDefaultAsync(x => x.Name.ToLower()==name.ToLower()).ConfigureAwait(false);
         }
 
@@ -125,54 +123,12 @@ namespace Core.Services.Items
             await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        public async Task AddProfileItemAsync(ulong discordID, ulong guildID, ProfileItem item)
-        { 
-            //XD it is like previous function but takes profileItem as an argument
-            //I should have made some kind of hierarchy to cast Item into ProfileItem
-            //this function basically works like purchase item, but does not require gold, takes actual item as an argument
-
-            using var context = new Context(_options);
-
-            Profile profile = await _profileService.GetOrCreateProfileAsync(discordID, guildID).ConfigureAwait(false);
-
-            //if something wrong will happen, just take a look here
-            //I don't know if I should do something like this
-            //item gets copied with its unique id...
-            profile.Items.Add(new ProfileItem { ProfileID = profile.ID, Item =item.Item});
-
-            context.Profiles.Update(profile);
-            await context.SaveChangesAsync().ConfigureAwait(false);
-        }
-        public async Task<bool> EquipItemAsync(ulong discordID, ulong guildID, ProfileItem item)
+        public async Task<Item> GetRandomItem()
         {
-            using var context = new Context(_options);
+            using var _context = new Context(_options);
+            int randomIndex = BotMath.RandomNumberGenerator.Next(1, _context.Items.Count());
 
-            bool succeded = await ChangeItem(discordID, guildID, item).ConfigureAwait(false);
-
-            if (succeded)
-                return true;
-            return false;
+            return await _context.Items.Where(x => x.ID == randomIndex).FirstOrDefaultAsync();
         }
-
-        //------------------------------------\\
-        //helpers
-        //-------------------------------------\\
-
-        //returns true if everything went ok
-        //this function checks whether profile has something equipped on the slot
-        //if not it deletes item from inventory and adds it to the equipment
-        //else adds item from equipment to inventory, adds item to equipment and then deletes it from inventory
-        //i hope it will work
-        //and oh god so much switches aaaaa, should have done it better
-        private async Task<bool> ChangeItem(ulong discordID, ulong guildID, ProfileItem item)
-        {
-            using var context = new Context(_options);
-            Profile profile = await _profileService.GetOrCreateProfileAsync(discordID, guildID);
- 
-            await context.SaveChangesAsync().ConfigureAwait(false);
-
-            return true;
-        }
-
     }
 }

@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DiscordBotNumeroDos.Dal.Migrations.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class AddProfileTimer : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -29,6 +30,30 @@ namespace DiscordBotNumeroDos.Dal.Migrations.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Mobs",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Strength = table.Column<int>(type: "int", nullable: false),
+                    Agility = table.Column<int>(type: "int", nullable: false),
+                    Intelligence = table.Column<int>(type: "int", nullable: false),
+                    Endurance = table.Column<int>(type: "int", nullable: false),
+                    Luck = table.Column<int>(type: "int", nullable: false),
+                    Resistance = table.Column<int>(type: "int", nullable: false),
+                    HP = table.Column<int>(type: "int", nullable: false),
+                    BaseDMG = table.Column<int>(type: "int", nullable: false),
+                    GoldAward = table.Column<int>(type: "int", nullable: false),
+                    XPAward = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Mobs", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Profiles",
                 columns: table => new
                 {
@@ -45,37 +70,15 @@ namespace DiscordBotNumeroDos.Dal.Migrations.Migrations
                     XP = table.Column<int>(type: "int", nullable: false),
                     Level = table.Column<int>(type: "int", nullable: false),
                     NextLevel = table.Column<int>(type: "int", nullable: false),
-                    Gold = table.Column<double>(type: "float", nullable: false)
+                    Gold = table.Column<double>(type: "float", nullable: false),
+                    lastQuestTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    nextQuestTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    lastFightTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    nextFightTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Profiles", x => x.ID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EquipmentItems",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ProfileID = table.Column<int>(type: "int", nullable: false),
-                    ItemID = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EquipmentItems", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_EquipmentItems_Items_ItemID",
-                        column: x => x.ItemID,
-                        principalTable: "Items",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_EquipmentItems_Profiles_ProfileID",
-                        column: x => x.ProfileID,
-                        principalTable: "Profiles",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -85,7 +88,7 @@ namespace DiscordBotNumeroDos.Dal.Migrations.Migrations
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProfileID = table.Column<int>(type: "int", nullable: false),
-                    ItemID = table.Column<int>(type: "int", nullable: true)
+                    ItemID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -95,7 +98,7 @@ namespace DiscordBotNumeroDos.Dal.Migrations.Migrations
                         column: x => x.ItemID,
                         principalTable: "Items",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ProfileItems_Profiles_ProfileID",
                         column: x => x.ProfileID,
@@ -103,16 +106,6 @@ namespace DiscordBotNumeroDos.Dal.Migrations.Migrations
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EquipmentItems_ItemID",
-                table: "EquipmentItems",
-                column: "ItemID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EquipmentItems_ProfileID",
-                table: "EquipmentItems",
-                column: "ProfileID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProfileItems_ItemID",
@@ -128,7 +121,7 @@ namespace DiscordBotNumeroDos.Dal.Migrations.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "EquipmentItems");
+                name: "Mobs");
 
             migrationBuilder.DropTable(
                 name: "ProfileItems");

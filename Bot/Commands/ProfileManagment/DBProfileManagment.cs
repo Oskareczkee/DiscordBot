@@ -19,6 +19,7 @@ namespace Bot.Commands.ProfileManagment
     {
 
         [Command("addskill")]
+        [Description("Allows to add skills to the profile")]
         public async Task AddSkill(CommandContext ctx)
         {
             ulong price = 0;
@@ -31,7 +32,7 @@ namespace Bot.Commands.ProfileManagment
                 Strength = 1 (Cost: {BotMath.SkillLevelUpCost(profile.Strength)})
                 Agility = 2 (Cost: {BotMath.SkillLevelUpCost(profile.Agility)})
                 Intelligence = 3 (Cost: {BotMath.SkillLevelUpCost(profile.Intelligence)})
-                Enudrance = 4 (Cost: {BotMath.SkillLevelUpCost(profile.Endurance)})
+                Endurance = 4 (Cost: {BotMath.SkillLevelUpCost(profile.Endurance)})
                 Luck = 5 (Cost: {BotMath.SkillLevelUpCost(profile.Luck)})",
                 skillAmountStep, 1, 5);
 
@@ -92,99 +93,5 @@ namespace Bot.Commands.ProfileManagment
             }
 
         }
-
-        [Command("equip")]
-        public async Task EqiupItem(CommandContext ctx)
-        {
-            Profile profile = await _profileService.GetOrCreateProfileAsync(ctx.Member.Id, ctx.Guild.Id);
-
-            ItemType itemType = ItemType.None;
-
-            var itemTypeStep = new IntStep(
-            @"What item do you want to change:
-                Helmet = 1,
-                Chestplate =2,
-                Gloves =3,
-                Shoes =4,
-                Weapon=5,
-                Ring=6,
-                Belt=7,
-                Necklace=8,
-                Extra=9",
-                null, 1, 9);
-
-            itemTypeStep.OnValidResult += (result) => itemType = (ItemType)result;
-
-            var typeDialogueHandler = new DialogueHandler(
-                ctx.Client,
-                ctx.Channel,
-                ctx.User,
-                itemTypeStep
-                );
-
-            bool succeded = await typeDialogueHandler.ProcessDialogue().ConfigureAwait(false);
-
-            if (!succeded)
-                return;
-
-            List<ProfileItem> availableItems = (from item in profile.Items where item.Item.Type == itemType select item).ToList();
-
-            if(availableItems.Count==0)
-            {
-                await ctx.Channel.SendMessageAsync($"It looks like you don't have any item of type {itemType.ToString()} in your inventory. What a shame!");
-                return;
-            }
-
-            var itemEmbed = new DiscordEmbedBuilder
-            {
-                ImageUrl = DiscordBot.Bot.Configuration.mamonPhotoURL,
-                Title = "Inventory",
-                Description = $"All items of type {itemType.ToString()} in your inventory",
-            };
-
-
-            //gets all item names for embed and its statistics and puts it into a string
-            string[] itemNames = (from item in availableItems
-                                  select item.Item.Name + " {Armor:" + item.Item.Armor
-                                  + " S:" + item.Item.Strength.ToString()
-                                  + " A:" + item.Item.Agility.ToString()
-                                  + " I:" + item.Item.Intelligence
-                                  + " E:" + item.Item.Endurance.ToString()
-                                  + " L:" + item.Item.Luck.ToString() + "}").ToArray();
-
-            //adding counters for items (I could propably do this in query, but that seemed to be problematic, this is just simpler approach)
-            //Insert operation on string might be ineffective 
-            //Good way to do this would be propably do the strings with counters and then concat to them string from query
-            for(int x =1; x<=itemNames.Length; x++)
-                itemNames[x - 1] = itemNames[x - 1].Insert(0, x.ToString() + ". ");
-
-            itemEmbed.AddField("Items: ", string.Join("\n", itemNames));
-
-            await ctx.Channel.SendMessageAsync(embed: itemEmbed);
-
-
-            int choice = 0;
-            var chooseItemStep = new IntStep("Please choose index of item you want to equip", null, 1, itemNames.Length);
-            chooseItemStep.OnValidResult = (result) => choice = result;
-
-            var chooseDialogueHandler = new DialogueHandler(
-                ctx.Client,
-                ctx.Channel,
-                ctx.User,
-                chooseItemStep
-                );
-
-            succeded = await chooseDialogueHandler.ProcessDialogue().ConfigureAwait(false);
-            if (!succeded)
-                return;
-
-            bool itemEquipped = await _itemService.EquipItemAsync(profile.DiscordID, profile.GuildID, availableItems[choice - 1]);
-
-            if (!itemEquipped)
-                await ctx.Channel.SendMessageAsync("EquipItem: item could not be equipped").ConfigureAwait(false);
-            else
-                await ctx.Channel.SendMessageAsync("Item has been succesfully equipped").ConfigureAwait(false);
-        }
-
     }
 }

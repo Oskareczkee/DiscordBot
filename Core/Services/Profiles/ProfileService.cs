@@ -28,7 +28,6 @@ namespace Core.Services.Profiles
         /// <param name="guildID"></param>
         /// <param name="itemName"></param>
         /// <returns>true if item was found, false if could'nt find item in inventory</returns>
-        Task<bool> UseItemAsync(ulong discordID, ulong guildID, ProfileItem item);
         Task<bool> UseItemAsync(ulong discordID, ulong guildID, Item item);
 
         /// <summary>
@@ -40,6 +39,9 @@ namespace Core.Services.Profiles
         /// <param name="amount"></param>
         /// <returns>true if everything went ok, false if skill type was none or undefined</returns>
         Task<bool> LevelUpSkill(ulong discordID, ulong guildID, SkillType skill, int amount, ulong goldPrice);
+        Task AddGold(ulong discordID, ulong guildID, int amount);
+
+        Task updateProfile(Profile profile);
 
     }
 
@@ -51,6 +53,17 @@ namespace Core.Services.Profiles
             _options = options;
         }
 
+        public async Task AddGold(ulong discordID, ulong guildID, int amount)
+        {
+            using var _context = new Context(_options);
+
+            Profile profile = await GetOrCreateProfileAsync(discordID, guildID);
+
+            profile.Gold += amount;
+
+            _context.Profiles.Update(profile);
+            await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
 
         public async Task<Profile> GetOrCreateProfileAsync(ulong discordID, ulong guildID)
         {
@@ -59,7 +72,6 @@ namespace Core.Services.Profiles
             Profile profile = await _context.Profiles.Where(x => x.GuildID == guildID)
                     .Include(x => x.Items)
                     .Include(x => x.Items).ThenInclude(x => x.Item)
-                    .Include(x=> x.Equipment).ThenInclude(x=> x.Item)
                     .FirstOrDefaultAsync(x => x.DiscordID == discordID)
                     .ConfigureAwait(false);
 
@@ -70,14 +82,11 @@ namespace Core.Services.Profiles
             {
                 DiscordID = discordID,
                 GuildID = guildID,
+                lastFightTime = DateTime.Now,
+                lastQuestTime=DateTime.Now,
+                nextFightTime=DateTime.Now,
+                nextQuestTime=DateTime.Now
             };
-            //profile.Equipment.Add(new EquipmentItem {ProfileID = profile.ID, Item=null});
-
-            //we initalize equipment after creating profile so it will have ID
-            await _context.AddAsync(profile).ConfigureAwait(false);
-            await _context.SaveChangesAsync().ConfigureAwait(false);
-
-            //profile.Equipment = Enumerable.Repeat(new EquipmentItem { ProfileID = profile.ID, Item = _context.Items.First()}, 9).ToList();
 
             _context.Profiles.Update(profile);
             await _context.SaveChangesAsync().ConfigureAwait(false);
@@ -125,24 +134,12 @@ namespace Core.Services.Profiles
             return true;
         }
 
-        public async Task<bool> UseItemAsync(ulong discordID, ulong guildID, ProfileItem item)
+        public async Task updateProfile(Profile profile)
         {
             using var _context = new Context(_options);
 
-            Profile profile = await GetOrCreateProfileAsync(discordID, guildID).ConfigureAwait(false);
-
-            var Item = profile.Items.FirstOrDefault(x => x.Item.Name.Equals(item.Item.Name, StringComparison.OrdinalIgnoreCase));
-
-            if (Item != null)
-            {
-                profile.Items.Remove(Item);
-                _context.ProfileItems.Remove(Item);
-                await _context.SaveChangesAsync().ConfigureAwait(false);
-                return true;
-            }
-
-            //item has not been found in inventory
-            return false;
+            _context.Profiles.Update(profile);
+            await _context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task<bool> UseItemAsync(ulong discordID, ulong guildID, Item item)

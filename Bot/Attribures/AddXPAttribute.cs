@@ -1,9 +1,4 @@
-﻿//this code is not used, but i keep it just to stay, maybe sometime it will be usefull
-//the problem is that attributes accept only const variables in it, and IExperienceService would we passed by reference it is not a const variable
-//Instead i implemented simple method in experience service
-
-
-using Core.Services.Profiles;
+﻿using Core.Services.Profiles;
 using DAL.Models.Profiles;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;

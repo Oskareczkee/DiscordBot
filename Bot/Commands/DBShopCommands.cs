@@ -27,7 +27,7 @@ namespace Bot.Commands
 
 
         [Command("additem")]
-        [RequireOwner]
+        [RequireRoles(RoleCheckMode.Any, "catboys paradise")]
         public async Task AddItem(CommandContext ctx)
         {
             Item item = new Item();
@@ -115,6 +115,7 @@ namespace Bot.Commands
         }
 
         [Command("itemlist")]
+        [Description("Show you list of all items")]
         public async Task ItemList(CommandContext ctx)
         {
             var items = await _itemService.GetItemsListAsync().ConfigureAwait(false);
@@ -146,6 +147,7 @@ namespace Bot.Commands
          
 
         [Command ("getitem")]
+        [Description("Gets specified item and shows its stats")]
         public async Task GetItem(CommandContext ctx)
         {
             var itemStep = new TextStep("What item are you looking for?", null);
@@ -202,6 +204,7 @@ namespace Bot.Commands
         }
 
         [Command("buy")]
+        [Description("Allows you to buy an item")]
         public async Task BuyItem(CommandContext ctx, params string[] itemName)
         {
             string fullName = string.Join(' ', itemName);

@@ -26,6 +26,15 @@ namespace Bot.Commands.Helpers
 
             await ctx.Channel.SendMessageAsync("Database has been successfully cleared out of data").ConfigureAwait(false);
         }
+
+        [Command("clearprofiles")]
+        [RequireOwner]
+        public async Task ClearProfiles(CommandContext ctx)
+        {
+            await _clearingService.ClearProfiles().ConfigureAwait(false);
+
+            await ctx.Channel.SendMessageAsync("Profiles have benn successfully cleard out of data");
+        }
     }
 #endif
 }

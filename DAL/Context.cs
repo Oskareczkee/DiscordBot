@@ -1,4 +1,5 @@
 ﻿using DAL.Models.Items;
+using DAL.Models.Mobs;
 using DAL.Models.Profiles;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,6 +16,6 @@ namespace DAL
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<ProfileItem> ProfileItems { get; set; }
-        public DbSet<EquipmentItem> EquipmentItems { get; set; }
+        public DbSet<Mob> Mobs { get; set; }
     }
 }

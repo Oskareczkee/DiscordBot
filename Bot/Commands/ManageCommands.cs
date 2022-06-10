@@ -15,6 +15,7 @@ namespace DiscordBot.Commands
     public class ManageCommands : BaseCommandModule
     {
         [Command("gaytest")]
+        [RequireItem("Paweł")]
         [Description("Rzetelny test sprawdzania czy jest się gejem")]
         public async Task GayTest(CommandContext ctx)
         {
@@ -75,8 +76,8 @@ namespace DiscordBot.Commands
         }
 
         [Command("mem")]
+        [RequireItem("Strona główna kwejk.pl")]
         [Description("Wysyla randomowego mema z folderu twórcy tego dzieła")]
-
         public async Task Mem(CommandContext ctx,
             [Description("(opcjonalny) nazwa mema do wysłania")] string name = null)
         {

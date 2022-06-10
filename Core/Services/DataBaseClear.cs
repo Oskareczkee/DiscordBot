@@ -22,6 +22,7 @@ namespace Core.Services
     public interface IDataBaseClearService
     {
         Task ClearDataBase();
+        Task ClearProfiles();
     }
 
     public class DataBaseClearService : IDataBaseClearService
@@ -38,7 +39,15 @@ namespace Core.Services
             using var context = new Context(_options);
 
             context.Database.EnsureDeleted();
+            //if database cannot get cleared put comment on line below and run the command
             await context.Database.MigrateAsync();
+        }
+
+        public async Task ClearProfiles()
+        {
+            using var context = new Context(_options);
+            context.Profiles.RemoveRange(context.Profiles);
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

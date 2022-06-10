@@ -48,7 +48,7 @@ namespace DiscordBot.Handlers.Dialogue
 
                     var cancelEmbed = new DiscordEmbedBuilder
                     {
-                        Title = "The Dialogue Has Successfully Been Canceled",
+                        Title = "The Dialogue Has Been Successfully Canceled",
                         Description = _user.Mention,
                         Color = DiscordColor.Goldenrod
                     };

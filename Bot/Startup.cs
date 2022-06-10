@@ -1,5 +1,7 @@
 ﻿using Core.Services;
+using Core.Services.Combat;
 using Core.Services.Items;
+using Core.Services.Mobs;
 using Core.Services.Profiles;
 using DAL;
 using Microsoft.AspNetCore.Builder;
@@ -27,6 +29,8 @@ namespace DiscordBot
             services.AddScoped<IItemService, ItemService>();
             services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IExperienceService, ExperienceService>();
+            services.AddScoped<ICombatService, CombatService>();
+            services.AddScoped<IMobService, MobService>();
 #if DATABASE_CLEAR
             services.AddScoped<IDataBaseClearService, DataBaseClearService>();
 #endif

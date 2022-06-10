@@ -9,13 +9,16 @@ using System.Threading.Tasks;
 
 using DiscordBot.Handlers.Dialogue.Steps;
 using DiscordBot.Handlers.Dialogue;
+using Bot.Attribures;
+using Bot.Commands.Helpers;
 
 namespace DiscordBot.Commands
 {
     public class BasicCommands : BaseCommandModule
     {
         [Command("ping")]
-        [Description("Pawel zamknij pizde wreszcie pls")]
+        [RequireItem("Brak tatuażów Pawła")]
+        [Description("Paweł gdzie są tatuaże?")]
         public async Task Ping(CommandContext ctx)
         {
             var Pawel = await ctx.Guild.GetMemberAsync(539867125704294400).ConfigureAwait(false);
@@ -32,6 +35,7 @@ namespace DiscordBot.Commands
         }
 
         [Command("respondmessage")]
+        [Description("responds to a message!")]
         public async Task Respond(CommandContext ctx)
         {
             var Interactivity = ctx.Client.GetInteractivity();
@@ -42,6 +46,7 @@ namespace DiscordBot.Commands
         }
 
         [Command("respondemoji")]
+        [Description("responds to a emoji!")]
         public async Task RespondEmoji(CommandContext ctx)
         {
             var Interactivity = ctx.Client.GetInteractivity();
@@ -52,6 +57,8 @@ namespace DiscordBot.Commands
         }
 
         [Command("ilepączkówzjadłeś")]
+        [RequireItem("Nadwaga")]
+        [Description("Wszystkie!!")]
         public async Task IlePaczkowZjadles(CommandContext ctx)
         {
             await ctx.Channel.SendMessageAsync("6");
@@ -100,6 +107,7 @@ namespace DiscordBot.Commands
         }
 
         [Command("huj")]
+        [RequireItem("Metr budowniczy z Białegostoku")]
         [Description("Pokazuje rozmiar twojego huja")]
 
         public async Task Huj(CommandContext ctx, 
@@ -117,7 +125,7 @@ namespace DiscordBot.Commands
 
             if (dickSize < 10)
                 await ctx.Channel.SendMessageAsync("XDD ale mały huj").ConfigureAwait(false);
-            if (dickSize > 25)
+            if (dickSize >= 25)
                 await ctx.Channel.SendMessageAsync("YOO niezły kutas!").ConfigureAwait(false);
 
             //upload proper message
@@ -125,6 +133,56 @@ namespace DiscordBot.Commands
                 await ctx.Channel.SendMessageAsync($"rozmiar huja {mention.Mention} wynosi {dickSize} cm");
             else
                 await ctx.Channel.SendMessageAsync($"rozmiar huja {ctx.User.Mention} wynosi {dickSize} cm");
+        }
+
+        [Command("github")]
+        [Description("Come and check my github!")]
+
+        public async Task Github(CommandContext ctx)
+        {
+            await ctx.Channel.SendMessageAsync("There you go, catch my github!").ConfigureAwait(false);
+            await ctx.Channel.SendMessageAsync(@"https://github.com/JacexDowozIrytacji/DiscordBot").ConfigureAwait(false);
+        }
+
+        [Command("random")]
+        [Description("generates random integer")]
+        public async Task Random(CommandContext ctx)
+        {
+            await ctx.Channel.SendMessageAsync(BotMath.RandomNumberGenerator.Next().ToString());
+        }
+
+        [Command("combathelp")]
+        [Description("Shows the basics of the combat")]
+        public async Task CombatHelp(CommandContext ctx)
+        {
+            var embed = new DiscordEmbedBuilder
+            {
+                Title = "Combat Basics",
+                Description = "Learn how to fight efficiently",
+                Color = DiscordColor.Aquamarine,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                {
+                    Url = Bot.Configuration.mamonPhotoURL,
+                    Width = 128,
+                    Height = 128
+                }
+            };
+
+            embed.AddField("Strength", "Increases your damage, makes your attacks harder to dodge");
+            embed.AddField("Agility", "Allows you to dodge enemies attacks, you can have maximally 50% to dodge an attack. Calculations: (defenderAgility * 1.25) - attackerStrength) * 0.01");
+            embed.AddField("Intelligence", @"Increases your ability to cast a spell instead of normal attack and increases your spell damage, you can have maximally 50% chance to cast a spell. 
+                                             Calculations: 
+                                             Magick Attack Chance (max 50%): (attackerLuck + attackerIntelligence) * 0.01
+                                             Magick Attack Damage Bonus (max 50%): (4 * attackerLevel) / defenderIntelligence");
+            embed.AddField("Endurance", "Increases your health. HP = Endurance * 2 * (Level + 1)");
+            embed.AddField("Luck", @"Increases your chance to deal critical hit, increases chance for magic attack and magic critical attack, Highers your chance for better XP and Gold rewards
+                                     Calculations:
+                                     Critical hit chance (max 50%): (attackerLuck * 5 / (defenderLevel * 2)) * 0.01
+                                     Gold reward:  (RandomNumberGenerator.NextDouble() + 1) * attackerLuck / (attackerLevel * 10)*(defenderLevel*10)
+                                     XP reward: (RandomNumberGenerator.NextDouble() + 1) * attackerLuck / (attackerLevel * 10)*(defenderLevel*20)");
+            embed.AddField("Armor", "Not implemented yet");
+
+            await ctx.Channel.SendMessageAsync(embed: embed).ConfigureAwait(false);
         }
     }
 }

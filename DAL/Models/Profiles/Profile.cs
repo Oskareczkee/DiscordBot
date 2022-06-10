@@ -1,5 +1,6 @@
 ﻿using DAL.Models;
 using DAL.Models.Items;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -34,11 +35,16 @@ namespace DAL.Models.Profiles
         public int Level { get; set; } = 1;
 
         public int NextLevel { get; set; }
-        public int HP => Endurance*2*(Level+1);
+        public int HP => Endurance * 2 * (Level + 1);
         public int BaseDMG => Level * 2;
         public double Gold { get; set; } = 100;
         public List<ProfileItem> Items { get; set; } = new List<ProfileItem>();
-        public List<EquipmentItem> Equipment { get; set; } = new List<EquipmentItem>(9);
 
+        //time for quests and fights
+        public DateTime lastQuestTime { get; set; }
+        public DateTime nextQuestTime { get; set; }
+
+        public DateTime lastFightTime { get; set; }
+        public DateTime nextFightTime { get; set; }
     }
 }

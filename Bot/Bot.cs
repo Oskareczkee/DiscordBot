@@ -118,6 +118,12 @@ namespace DiscordBot
 
             //profile commands
             Commands.RegisterCommands<DBProfileCommands>();
+
+            //combat commands
+            Commands.RegisterCommands<DBCombatCommands>();
+
+            //mobs
+            Commands.RegisterCommands<DBMobCommands>();
 #if DATABASE_CLEAR
             Commands.RegisterCommands<ClearDatabase>();
 #endif
